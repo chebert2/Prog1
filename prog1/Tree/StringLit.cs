@@ -15,14 +15,15 @@ namespace Tree
 
         public override void print(int n)
         {
-	    // There got to be a more efficient way to print n spaces.
-	    for (int i = 0; i < n; i++)
+            // There got to be a more efficient way to print n spaces.
+            for (int i = 0; i < n; i++)
                 Console.Write(" ");
 
-            Console.WriteLine("\"" + stringVal + "\"");
+            Console.Write("\"" + stringVal + "\"");
         }
 
         public override bool isString() { return true; }
+
+        public string getString() { return stringVal; }
     }
 }
-

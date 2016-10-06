@@ -7,9 +7,14 @@ namespace Tree
     public class Begin : Special
     {
         // TODO: Add any fields needed.
- 
+        public int IndentationInt;
+        public string IndentationString;
+
         // TODO: Add an appropriate constructor.
-	public Begin() { }
+        public Begin()
+        {
+            
+        }
 
         public override void print(Node t, int n, bool p)
         {

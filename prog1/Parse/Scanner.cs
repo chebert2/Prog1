@@ -5,9 +5,12 @@ using System.IO;
 using Tokens;
 
 namespace Parse
-{
+{   
+
     public class Scanner
     {
+        // a variable for if the mode is in debugger or not
+        public static bool flag_debugger;
 
         private BufferedStream bs;
 
@@ -34,8 +37,12 @@ namespace Parse
 
         public Scanner()
         {
-            bs = new BufferedStream(Console.OpenStandardInput(8192));
-            reader = new StreamReader(bs);
+            
+            //bs = new BufferedStream(Console.OpenStandardInput(8192));
+            //reader = new StreamReader(bs);
+            FileStream file2 = File.OpenRead("C:/Users/Colin/Desktop/file1.txt");
+            //bs = new BufferedStream(Console.OpenStandardInput(8192));
+            reader = new StreamReader(file2);
 
         }
         /** reads another line...
@@ -279,7 +286,8 @@ namespace Parse
                     returnToken = new Token(TokenType.QUOTE);
                     //return new Token (TokenType.QUOTE);
 
-                    Console.WriteLine("value: \'");
+                    if(flag_debugger)
+                        Console.WriteLine("value: \'");
                     return returnToken;
                 }
 
@@ -295,8 +303,8 @@ namespace Parse
                     numberParentheses_L++;
 
                     returnToken = new Token(TokenType.LPAREN);
-
-                    Console.WriteLine("value: (");
+                    if (flag_debugger)
+                        Console.WriteLine("value: (");
 
                     return returnToken;
 
@@ -312,8 +320,8 @@ namespace Parse
                     if (numberParentheses_R > numberParentheses_L)
                     {
                         this.charIndexOfReadLine++;
-
-                        Console.WriteLine("Too many Right Parentheses>: error! \n continued... :Last input ignored!");
+                        if (flag_debugger)
+                            Console.WriteLine("Too many Right Parentheses>: error! \n continued... :Last input ignored!");
 
                         return getNextToken();
 
@@ -330,8 +338,8 @@ namespace Parse
                         this.charIndexOfReadLine++;
 
                         returnToken = new Token(TokenType.RPAREN);
-
-                        Console.WriteLine("value: )");
+                        if (flag_debugger)
+                            Console.WriteLine("value: )");
 
                         return returnToken;
                     }
@@ -347,8 +355,8 @@ namespace Parse
 
                     this.charIndexOfReadLine++;
 
-
-                    Console.WriteLine("value: . @dot");
+                    if (flag_debugger)
+                        Console.WriteLine("value: . ");
 
                     // We ignore the special identifier `...'.
 
@@ -386,7 +394,8 @@ namespace Parse
                             this.charIndexOfReadLine++;
 
                             returnToken = new Token(TokenType.TRUE);
-                            Console.WriteLine("value: true");
+                            if (flag_debugger)
+                                Console.WriteLine("value: true");
 
                             //return new Token (TokenType.TRUE);
                             return returnToken;
@@ -401,7 +410,9 @@ namespace Parse
                             this.charIndexOfReadLine++;
 
                             returnToken = new Token(TokenType.FALSE);
-                            Console.WriteLine("value: false");
+
+                            if (flag_debugger)
+                                Console.WriteLine("value: false");
 
                             //return new Token (TokenType.FALSE);
                             return returnToken;
@@ -412,8 +423,8 @@ namespace Parse
 
                         {
                             this.charIndexOfReadLine++;
-
-                            Console.WriteLine("Illegal character '" +
+                            if (flag_debugger)
+                                Console.WriteLine("Illegal character '" +
 
                             ch + "' following #");
 
@@ -520,7 +531,8 @@ namespace Parse
 
                     if (!endOfSomeStringReached)
                     {
-                        Console.WriteLine("String does not finish on line,... error: ran out of characters.");
+                        if (flag_debugger)
+                            Console.WriteLine("String does not finish on line,... error: ran out of characters.");
                         return getNextToken();
                     }
 
@@ -535,8 +547,8 @@ namespace Parse
                         returnToken = new StringToken(new String(buf, someStringLowerBound, someStringLength));
 
                         // return string literal ... that was just scanned
-
-                        Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
 
@@ -557,8 +569,8 @@ namespace Parse
                         // copy char to token
 
                         returnToken = new StringToken(new String(buf, someStringLowerBound, someStringLength));
-
-                        Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
 
@@ -633,7 +645,8 @@ namespace Parse
 
                             {
                                 // error 
-                                Console.WriteLine("incorrect decimal form: needs a number for right side of decimal.");
+                                if (flag_debugger)
+                                    Console.WriteLine("incorrect decimal form: needs a number for right side of decimal.");
 
                                 return getNextToken();
 
@@ -696,8 +709,8 @@ namespace Parse
                                 {
 
                                     this.charIndexOfReadLine++;
-
-                                    Console.WriteLine("illegal previous number. Use of right ')' not correct.");
+                                    if (flag_debugger)
+                                        Console.WriteLine("illegal previous number. Use of right ')' not correct.");
 
                                     return getNextToken();
                                 }
@@ -716,8 +729,8 @@ namespace Parse
 
                                     int intVal = Convert.ToInt32(intermediateVal);
                                     returnToken = new IntToken(intVal);
-
-                                    Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
+                                    if (flag_debugger)
+                                        Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
 
                                     return returnToken;
 
@@ -777,8 +790,8 @@ namespace Parse
                         {
 
                             this.charIndexOfReadLine++;
-
-                            Console.WriteLine("illegal numeric decimal form: cannot have more than one period.");
+                            if (flag_debugger)
+                                Console.WriteLine("illegal numeric decimal form: cannot have more than one period.");
 
                             return getNextToken();
 
@@ -792,8 +805,8 @@ namespace Parse
 
                         {
                             this.charIndexOfReadLine++;
-
-                            Console.WriteLine("incorrect decimal form: need a number for right side of decimal \n illegal start of identifier. : an identifier cannot start with numerical digits.");
+                            if (flag_debugger)
+                                Console.WriteLine("incorrect decimal form: need a number for right side of decimal \n illegal start of identifier. : an identifier cannot start with numerical digits.");
 
                             return getNextToken();
 
@@ -811,8 +824,8 @@ namespace Parse
 
                         {
                             this.charIndexOfReadLine++;
-
-                            Console.WriteLine("illegal start of number. : an number cannot start with numerical digits.");
+                            if (flag_debugger)
+                                Console.WriteLine("illegal start of number. : an number cannot start with numerical digits.");
 
                             return getNextToken();
 
@@ -881,8 +894,8 @@ namespace Parse
 
 
                         // return string literal ... that was just scanned
-
-                        Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
 
@@ -910,8 +923,8 @@ namespace Parse
 
 
                         // return string literal ... that was just scanned
-
-                        Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("value: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
 
@@ -926,15 +939,16 @@ namespace Parse
 
                         int intVal = Convert.ToInt32( intermediateVal );
                         returnToken = new IntToken(intVal);
-
-                        Console.WriteLine("number does not finish on line,... or,  error: ran out of characters current line.");
+                        if (flag_debugger)
+                            Console.WriteLine("number does not finish on line,... or,  error: ran out of characters current line.");
 
                         return returnToken;
                     }
 
                     else if (!endOfSomeStringReached && (number_lastCharWasDecimal))
                     {
-                        Console.WriteLine("number incomplete __ ends with decimal at end of line,... error: ran out of characters current line.");
+                        if (flag_debugger)
+                            Console.WriteLine("number incomplete __ ends with decimal at end of line,... error: ran out of characters current line.");
                         return getNextToken();
                     }
 
@@ -1043,7 +1057,8 @@ namespace Parse
                             {
                                 this.charIndexOfReadLine++;
 
-                                Console.WriteLine("Too many Right Parentheses>: error! \n continued... :Last input ignored!");
+                                if (flag_debugger)
+                                    Console.WriteLine("Too many Right Parentheses>: error! \n continued... :Last input ignored!");
                                 return getNextToken();
 
                             }
@@ -1132,8 +1147,8 @@ namespace Parse
 
                         {
                             this.charIndexOfReadLine++;
-
-                            Console.WriteLine("illegal character within identifier: error with accepted char' code elements.");
+                            if (flag_debugger)
+                                Console.WriteLine("illegal character within identifier: error with accepted char' code elements.");
 
                             return getNextToken();
                             //break;
@@ -1169,8 +1184,8 @@ namespace Parse
                         // return string literal ... that was just scanned
 
                         returnToken = new IdentToken(new String(buf, someStringLowerBound, someStringLength));
-
-                        Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
 
 
                         return returnToken;
@@ -1186,8 +1201,8 @@ namespace Parse
 
 
                         returnToken = new IdentToken(new String(buf, someStringLowerBound, someStringLength));
-
-                        Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
                     }
@@ -1197,8 +1212,8 @@ namespace Parse
 
 
                         returnToken = new IdentToken(new String(buf, someStringLowerBound, someStringLength));
-
-                        Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
+                        if (flag_debugger)
+                            Console.WriteLine("Identifier: " + new String(buf, someStringLowerBound, someStringLength));
 
                         return returnToken;
                     }
@@ -1217,8 +1232,8 @@ namespace Parse
 
                 {
                     this.charIndexOfReadLine++;
-
-                    Console.WriteLine("error char");
+                    if (flag_debugger)
+                         Console.WriteLine("error char");
 
                     return getNextToken();
 

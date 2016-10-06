@@ -65,6 +65,18 @@ namespace Tree
             form.print(this, n, p);
         }
         public override bool isPair() { return true; }
+
+        // TODO: Report an error in these default methods and implement them
+        // in class Cons.  After setCar, a Cons cell needs to be `parsed' again
+        // using parseList.
+        public override Node getCar()        {            return car;        }
+        public override Node getCdr()        {            return cdr;
+        }
+        public override void setCar(Node a)        {            car = a;
+        }        public virtual void setCdr(Node d)
+        {
+            cdr = d;
+
+        }
     }
 }
-

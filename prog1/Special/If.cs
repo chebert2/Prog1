@@ -7,9 +7,14 @@ namespace Tree
     public class If : Special
     {
         // TODO: Add any fields needed.
- 
+        public int IndentationInt;
+        public string IndentationString;
+
         // TODO: Add an appropriate constructor.
-	public If() { }
+        public If()
+        {
+            
+        }
 
         public override void print(Node t, int n, bool p)
         {

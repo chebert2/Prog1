@@ -7,6 +7,8 @@ using Tree;
 
 public class SPP
 {
+    //public static int totalIndentation = 0;
+
     public static int Main(string[] args)
     {
         // Create scanner that reads from standard input
@@ -21,28 +23,12 @@ public class SPP
 
         // If command line option -d is provided, debug the scanner.
         if (args.Length == 1 && args[0].Equals("-d"))
-        {
-            // Console.Write("Scheme 4101> ");
-            Token tok = scanner.getNextToken();
-            while (tok != null)
-            {
-                TokenType tt = tok.getType();
-
-                Console.Write(tt);
-                if (tt == TokenType.INT)
-                    Console.WriteLine(", intVal = " + tok.getIntVal());
-                else if (tt == TokenType.STRING)
-                    Console.WriteLine(", stringVal = " + tok.getStringVal());
-                else if (tt == TokenType.IDENT)
-                    Console.WriteLine(", name = " + tok.getName());
-                else
-                    Console.WriteLine();
-
-                // Console.Write("Scheme 4101> ");
-                tok = scanner.getNextToken();
-            }
-            return 0;
-        }
+            // set to debugging_mode
+            Scanner.flag_debugger = true;
+        else
+            Scanner.flag_debugger = false;
+            
+        
 
         // Create parser
         Parser parser = new Parser(scanner);
@@ -53,7 +39,8 @@ public class SPP
         while (root != null)
         {
             // ok
-            //root.print(0);
+ 
+            root.print(0);
             root = parser.parseExp();
         }
 

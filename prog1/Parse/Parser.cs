@@ -41,10 +41,10 @@ namespace Parse
 {
     public class Parser
     {
-
+        
         private Scanner scanner;
 
-        public Nil nil_object = new Nil();
+        public static Nil nil_object = new Nil();
 
         private static Token currentToken1;
         private static Token currentToken2;
@@ -89,8 +89,8 @@ namespace Parse
             if (currentToken1.getType() == TokenType.LPAREN)
             {
                 returnNode = parseRest();
-
-                Console.WriteLine(" parseRest Needed...");
+                if (Scanner.flag_debugger)
+                    Console.WriteLine(" parseRest Needed...");
 
                 // define node in static variable for future reference !... after a unit has parsed a leftSide list !
                 //currentNode_ofToken1 = returnNode;
@@ -191,7 +191,8 @@ namespace Parse
                 if (currentToken1.getType() == TokenType.LPAREN)
                 {
                     // print that there was parser error
-                    Console.WriteLine("error: Dot has no car __  preceeded by LParen.");
+                    if (Scanner.flag_debugger)
+                        Console.WriteLine("error: Dot has no car __  preceeded by LParen.");
                     currentToken1 = currentToken2;
 
                     currentToken2 = this.scanner.getNextToken();
@@ -264,12 +265,14 @@ namespace Parse
                                   currentToken2.getType() == TokenType.TRUE ||
                                   currentToken2.getType() == TokenType.FALSE)
                                 {
-                                    Console.WriteLine("error : cannot have any more than one literal for dot non-list tail.");
+                                    if (Scanner.flag_debugger)
+                                        Console.WriteLine("error : cannot have any more than one literal for dot non-list tail.");
                                     continue;
                                 }
                                 else
                                 {
-                                    Console.WriteLine("error : cannot have any identifiers or lists in non-list tail.");
+                                    if (Scanner.flag_debugger)
+                                        Console.WriteLine("error : cannot have any identifiers or lists in non-list tail.");
                                     continue;
                                 }
 
