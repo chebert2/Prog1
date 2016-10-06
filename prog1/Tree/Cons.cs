@@ -1,4 +1,4 @@
-// Cons -- Parse tree node class for representing a Cons node
+e// Cons -- Parse tree node class for representing a Cons node
 
 using System;
 
@@ -69,11 +69,21 @@ namespace Tree
         // TODO: Report an error in these default methods and implement them
         // in class Cons.  After setCar, a Cons cell needs to be `parsed' again
         // using parseList.
-        public override Node getCar()        {            return car;        }
-        public override Node getCdr()        {            return cdr;
-        }
-        public override void setCar(Node a)        {            car = a;
-        }        public virtual void setCdr(Node d)
+        public override Node getCar()
+        {
+            return car;
+        }
+
+        public override Node getCdr()
+        {
+            return cdr;
+        }
+
+        public override void setCar(Node a)
+        {
+            car = a;
+        }
+        public override void setCdr(Node d)
         {
             cdr = d;
 
