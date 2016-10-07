@@ -8,12 +8,12 @@ namespace Tree
     {
         public Nil() { }
 
-        public override void print(int n)
+        public override int print(int n)
         {
-            print(n, false);
+            return print(n, false);
         }
 
-        public override void print(int n, bool p)
+        public override int print(int n, bool p)
         {
             // There got to be a more efficient way to print n spaces.
             for (int i = 0; i < n; i++)
@@ -23,6 +23,7 @@ namespace Tree
                 Console.Write(")");
             else
                 Console.Write("()");
+            return n + 2 ;
         }
         public override bool isNull() { return true; }
     }
