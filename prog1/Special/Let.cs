@@ -14,6 +14,23 @@ namespace Tree
         public override void print(Node t, int n, bool p)
         {
             // TODO: Implement this function.
+	    Node cadr = t.getCdr().getCar();
+	    Node cddr = t.getCdr().getCdr();
+	    Console.Writeline("(");
+	    t.getCar().print(n, true);
+	    Console.Writeline();
+	    n++;
+	    
+	    // i want to change form to regular but don't know how
+	    
+	    while(t.getCdr() != null)
+	    {
+	    	cadr.print(n, false);
+		Console.Writeline();
+		t.getCdr() = cddr;
+            }
+	    t.getCdr().print(n, true);
+	    Console.Writeline();
         }
     }
 }
