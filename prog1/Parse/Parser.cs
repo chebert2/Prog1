@@ -49,9 +49,13 @@ namespace Parse
         private static Token currentToken1;
         private static Token currentToken2;
 
-        //private static Node currentNode_ofToken1;
+        public static int number_of_Left_parentheses_extra_over_zero = 0;
 
-        private static bool firstRun;
+        public static bool firstRun;
+
+        public static bool stillReadFirstParenthesis;
+        // this to keep track of parenthesis around a dotted   (expression . () )
+        public static bool tail_item_A_list = false;
 
         public Parser(Scanner s)
         {
@@ -61,13 +65,14 @@ namespace Parse
             scanner = s;
 
             firstRun = true;
+            stillReadFirstParenthesis = true;
         }
 
         public Node parseExp()
         {
             // TODO: write code for parsing an exp
 
-
+            
 
             Node returnNode = null;
 
@@ -80,17 +85,54 @@ namespace Parse
             }
             else
                 currentToken1 = currentToken2;
+            // special case of single quote
+            // construct expression (quote rest) given current first token was ' char 
+            // and we redirected a Lparenthesis instead for preceeding currentToken1 instead of a ' char
+            // in order to start (quote
+            if (scanner.quoteMark_engaged == true)
+            {
+                currentToken2 = new Token(TokenType.QUOTE);
 
-            currentToken2 = this.scanner.getNextToken();
+                // remove char '    advance of QUOTE
+                scanner.quoteMark_engaged = false;
+            }
+
+            // ignore above if test! 
+            //for
+            // Conventional normal run
+            else
+            {
+                if (Parser.number_of_Left_parentheses_extra_over_zero != 0 || stillReadFirstParenthesis)
+                {
+
+                    currentToken2 = this.scanner.getNextToken();
+                    stillReadFirstParenthesis = false;
+                }
+                // do not read another token because input end is now there.  
+                else
+                {
+                    // a pointless declaration to currentToken2
+                    // _ for end of total parsed expression...
+                       // we just don't want currentToken2 to be null
+                    currentToken2 = new Token(TokenType.LPAREN);
+                    if (Scanner.flag_debugger)
+                        Console.Write("expression complete: Not reading additional tokens in this line.");
+                }
+            }
+
 
             if (currentToken1 == null)
                 return null;
 
             if (currentToken1.getType() == TokenType.LPAREN)
             {
-                returnNode = parseRest();
+                number_of_Left_parentheses_extra_over_zero++;
+
+                
                 if (Scanner.flag_debugger)
-                    Console.WriteLine(" parseRest Needed...");
+                    Console.WriteLine("LPAREN");
+
+                returnNode = parseRest();
 
                 // define node in static variable for future reference !... after a unit has parsed a leftSide list !
                 //currentNode_ofToken1 = returnNode;
@@ -104,6 +146,9 @@ namespace Parse
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
 
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("FALSE");
+
                 return returnNode;
             }
             else if (currentToken1.getType() == TokenType.TRUE)
@@ -112,6 +157,9 @@ namespace Parse
 
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
+
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("TRUE");
 
                 return returnNode;
             }
@@ -122,6 +170,9 @@ namespace Parse
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
 
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("INT, intVAL =" + currentToken1.getIntVal());
+
                 return returnNode;
             }
             else if (currentToken1.getType() == TokenType.STRING)
@@ -131,18 +182,21 @@ namespace Parse
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
 
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("STRING, stringVal =" + currentToken1.getStringVal());
+
                 return returnNode;
             }
-
-
             else if (currentToken1.getType() == TokenType.QUOTE)
             {
-                returnNode = new Cons(new Ident("Quote"), parseExp());
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("IDENT, name = quote");
+
+                return new Ident("quote");
 
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
 
-                return returnNode;
             }
             else if (currentToken1.getType() == TokenType.IDENT)
             {
@@ -151,34 +205,46 @@ namespace Parse
                 // define node in static variable for future reference !
                 //currentNode_ofToken1 = returnNode;
 
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("IDENT, name = " + currentToken1.getName());
+
                 return returnNode;
             }
 
             else
-                throw new Exception("Error: Token is null");
+            {
+                Console.Error.WriteLine("Error: Token is unidentifiable in our grammar.");
+                return null;
+            }
 
 
         }
 
         protected Node parseRest()
         {
+            
             Node endReturnNode = null;
 
             // TODO: write code for parsing a rest
             if (currentToken2 == null)
-                throw new Exception("stops at start of expression_ Or while exceeded balance of LeftParentheses. Not a complete statement.");
-
-
+            {
+                Console.Error.WriteLine("stops at start of expression_ Or while exceeded balance of LeftParentheses. Not a complete statement.");
+                return null;
+            }
             if (currentToken2.getType() == TokenType.RPAREN)
             {
-
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("RPAREN");
                 endReturnNode = nil_object;
                 // prevent Rest from repeating a nil
                 currentToken1 = currentToken2;
 
-                currentToken2 = this.scanner.getNextToken();
+                
 
+                Parser.number_of_Left_parentheses_extra_over_zero--;
 
+                if(Parser.number_of_Left_parentheses_extra_over_zero != 0)
+                  currentToken2 = this.scanner.getNextToken();
 
             }
             // work on  in parseRest() Like handling single following right ')'
@@ -191,11 +257,12 @@ namespace Parse
                 if (currentToken1.getType() == TokenType.LPAREN)
                 {
                     // print that there was parser error
-                    if (Scanner.flag_debugger)
-                        Console.WriteLine("error: Dot has no car __  preceeded by LParen.");
+                    
+                    Console.Error.WriteLine("error: Dot has no car __  preceeded by LParen.");
                     currentToken1 = currentToken2;
 
                     currentToken2 = this.scanner.getNextToken();
+                    
                     return parseRest();
                     //ends if that happens
                 }
@@ -207,17 +274,42 @@ namespace Parse
                 if (currentToken2 != null)
                 {
                     if (currentToken2.getType() == TokenType.INT)
+                    {
                         endReturnNode = new IntLit(currentToken2.getIntVal());
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("INT, intVAL =" + currentToken2.getIntVal());
+                    }
                     else if (currentToken2.getType() == TokenType.STRING)
+                    {
                         endReturnNode = new StringLit(currentToken2.getStringVal());
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("STRING, stringVal =" + currentToken2.getStringVal());
+                    }
                     else if (currentToken2.getType() == TokenType.TRUE)
+                    {
                         endReturnNode = new BoolLit(true);
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("TRUE");
+                    }
                     else if (currentToken2.getType() == TokenType.FALSE)
+                    {
                         endReturnNode = new BoolLit(false);
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("FALSE");
+                    }
                     else if (currentToken2.getType() == TokenType.IDENT)
+                    {
                         endReturnNode = new Ident(currentToken2.getName());
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("Ident, name =" + currentToken2.getName());
+                    }
                     else
+                    {
+                        Parser.tail_item_A_list = true;
                         return parseExp();
+
+
+                    }
 
 
                     // check if there is correct grammar for a tail node with it's sole_literal value
@@ -249,7 +341,8 @@ namespace Parse
                             if (currentToken2 == null)
                             {
                                 additional_ReadMore = false;
-                                throw new Exception("ends abruptly afterr dot_ . in list with tail items.");
+                                Console.Error.WriteLine("ends abruptly after dot_ . in list with tail items.");
+                                return null;
                                 //break;
                             }
                             else if (currentToken2.getType() == TokenType.RPAREN)
@@ -286,7 +379,11 @@ namespace Parse
 
                 }
                 else
-                    throw new Exception("Ends early with Dot [cons/] element");
+                {
+                    Console.Error.WriteLine("Ends early with Dot [cons/] element");
+                    return null;
+                }
+                    
 
                 endReturnNode = null;
                 return endReturnNode;
@@ -294,7 +391,22 @@ namespace Parse
             // this does any further expansion of the parse tree  in any Cons created
             else
             {
-                endReturnNode = new Cons(parseExp(), parseRest());
+                Node oneExpression = parseExp();
+                Node rest = parseRest();
+                if (oneExpression == null)
+                    return null;
+                else if (rest == null)
+                    return null;
+                endReturnNode = new Cons(oneExpression , rest);
+                // print out the last parenthesis   in a cons with a dot
+                if (Parser.tail_item_A_list)
+                {
+                    if (Scanner.flag_debugger)
+                        Console.WriteLine("RPAREN");
+                    // turn it back off now.
+                    Parser.tail_item_A_list = false;
+                }
+
             }
 
 
