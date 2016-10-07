@@ -19,7 +19,7 @@ namespace Tree
         {
          Node cadr = t.getCdr().getCar();
          Node cddr = t.getCdr().getCdr();
-            if (p == false)
+            if (p != false)
                 Console.WriteLine("(");
             t.getCar().print(n);
             if (t.getCdr() == null)
