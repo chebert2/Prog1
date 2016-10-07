@@ -34,13 +34,30 @@ public class SPP
         Parser parser = new Parser(scanner);
         Node root;
 
+        
+        Special.localExpression_ended_case = false;
+        Regular.boolean_first_run = true;
+        Regular.lastCall_was_to_cdr = false;
+
         // Parse and pretty-print each input expression
+
         root = parser.parseExp();
         while (root != null)
         {
-            // ok
- 
             root.print(0);
+            
+                 //an error if Console.WriteLine(Parser.number_of_Left_parentheses_extra_over_zero); 
+            Parser.firstRun = true;
+            Parser.stillReadFirstParenthesis = true;
+            // start new parse line
+            Console.WriteLine();
+            scanner.numberParentheses_L = 0;
+            scanner.numberParentheses_R = 0;
+            Parser.tail_item_A_list = false;
+            Special.localExpression_ended_case = false;
+            Regular.boolean_first_run = true;
+            Regular.lastCall_was_to_cdr = false;
+
             root = parser.parseExp();
         }
 
