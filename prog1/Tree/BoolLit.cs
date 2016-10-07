@@ -13,7 +13,7 @@ namespace Tree
             boolVal = b;
         }
 
-        public override void print(int n)
+        public override int print(int n)
         {
             // There got to be a more efficient way to print n spaces.
             for (int i = 0; i < n; i++)
@@ -23,6 +23,7 @@ namespace Tree
                 Console.Write("#t");
             else
                 Console.Write("#f");
+            return n + 2;
         }
         public override bool isBool()
         {
