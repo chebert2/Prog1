@@ -18,8 +18,12 @@ namespace Tree
 
         public override void print(Node t, int n, bool p)
         {
-            // TODO: Implement this function.
-        }
+            // TODO: Implement this function
+            if(p != null)
+                Console.Writeline("(");
+            t.getCar().print(n);
+            
+       }
     }
 }
 
