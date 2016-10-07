@@ -11,7 +11,7 @@ namespace Tree
         // TODO: Add an appropriate constructor.
 	public Quote() { }
 
-        public override void print(Node t, int n, bool p)
+        public override int print(Node t, int n, bool p)
         {
             // working implementation
 
@@ -22,8 +22,18 @@ namespace Tree
             }
             
             Console.Write("'");
-            n++;
-            t.getCdr().print(n);
+
+            if (t.getCdr().isPair())
+                if (t.getCdr().getCdr().isNull())
+                    return 1 + t.getCdr().getCar().print(0, false);
+                else
+                    return 1 + t.getCdr().print(0, false);
+            else
+            {
+                Console.Error.WriteLine("quote has no parameter.");
+                return 0;
+            }
+                
         }
     }
 }
