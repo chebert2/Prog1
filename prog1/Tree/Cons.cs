@@ -1,4 +1,4 @@
-e// Cons -- Parse tree node class for representing a Cons node
+// Cons -- Parse tree node class for representing a Cons node
 
 using System;
 
@@ -34,19 +34,19 @@ namespace Tree
                 string type = a.getSymbol();
                 if (type.Equals("quote"))
                     form = new Quote();
-                if (type.Equals("if"))
+                else if (type.Equals("if"))
                     form = new If();
-                if (type.Equals("begin"))
+                else if (type.Equals("begin"))
                     form = new Begin();
-                if (type.Equals("cond"))
+                else if (type.Equals("cond"))
                     form = new Cond();
-                if (type.Equals("define"))
+                else if (type.Equals("define"))
                     form = new Define();
-                if (type.Equals("lambda"))
+                else if (type.Equals("lambda"))
                     form = new Lambda();
-                if (type.Equals("let"))
+                else if (type.Equals("let"))
                     form = new Let();
-                if (type.Equals("set!"))
+                else if (type.Equals("set!"))
                     form = new Set();
                 else
                     form = new Regular();
@@ -55,14 +55,14 @@ namespace Tree
                 form = new Regular();
         }
 
-        public override void print(int n)
+        public override int print(int n)
         {
-            form.print(this, n, false);
+            return form.print(this, n, false);
         }
 
-        public override void print(int n, bool p)
+        public override int print(int n, bool p)
         {
-            form.print(this, n, p);
+            return form.print(this, n, p);
         }
         public override bool isPair() { return true; }
 
