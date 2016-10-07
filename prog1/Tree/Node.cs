@@ -8,7 +8,7 @@ namespace Tree
 
         // The argument of print(int) is the number of characters to indent.
         // Every subclass of Node must implement print(int).
-        public virtual void print(int n) { }
+        public virtual int print(int n) { return 0; }
 
         // The first argument of print(int, bool) is the number of characters
         // to indent.  It is interpreted the same as for print(int).
@@ -25,9 +25,10 @@ namespace Tree
         // encode that in the sign bit of n. If you need additional parameters,
         // make sure that you define the method print in all the appropriate
         // subclasses of Node as well.
-        public virtual void print(int n, bool p)
+        public virtual int print(int n, bool p)
         {
             print(n);
+            return 0;
         }
 
         // For parsing Cons nodes, for printing trees, and later for
@@ -45,13 +46,26 @@ namespace Tree
         // TODO: Report an error in these default methods and implement them
         // in class Cons.  After setCar, a Cons cell needs to be `parsed' again
         // using parseList.
-        public virtual Node getCar()        {            Console.WriteLine("Error: car not found or unretrieved.");
-            return null;        }
-        public virtual Node getCdr()        {            Console.WriteLine("Error: cdr not found or unretrieved.");            return null;
-        }
-        public virtual void setCar(Node a)        {            Console.WriteLine("Error: cannot set car.");
-        }        public virtual void setCdr(Node d)
-        {            Console.WriteLine("Error: cannot set cdr.");
+        public virtual Node getCar()
+        {
+            Console.WriteLine("Error: car not found or unretrieved.");
+
+            return null;
+        }
+
+        public virtual Node getCdr()
+        {
+            Console.WriteLine("Error: cdr not found or unretrieved.");
+            return null;
+        }
+
+        public virtual void setCar(Node a)
+        {
+            Console.WriteLine("Error: cannot set car.");
+        }
+        public virtual void setCdr(Node d)
+        {
+            Console.WriteLine("Error: cannot set cdr.");
 
         }
 
