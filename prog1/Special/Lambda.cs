@@ -17,7 +17,10 @@ namespace Tree
 	    for (int i = 0; i<n; i++)
 	    {
 	    	Console.Writeline(" ");
-		            	
+	    }
+	    if(p == true)
+	    	Console.Writeline("(");
+    									
 	    
   	}
     }
