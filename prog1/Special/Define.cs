@@ -20,9 +20,6 @@ namespace Tree
          Node cadr = t.getCdr().getCar();
             if (p == false)
                 Console.WriteLine("(");
-            //is following line needed?
-            Console.WriteLine("define");
-            //or do i only need the folloing line?
             t.getCar().print(n);
             if (t.getCdr() == null)
             {
