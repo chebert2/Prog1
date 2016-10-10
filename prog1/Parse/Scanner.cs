@@ -36,6 +36,12 @@ namespace Parse
 
         public bool quoteMark_engaged = false;
 
+        public Token preinspected_PEEK_token;
+
+        public bool ifPast_lookWasPeek;
+
+        public bool makeANew_Peek;
+
         public Scanner()
         {
             
@@ -44,6 +50,11 @@ namespace Parse
             FileStream file2 = File.OpenRead("C:/Users/Colin/Desktop/file1.txt");
             //bs = new BufferedStream(Console.OpenStandardInput(8192));
             reader = new StreamReader(file2);
+
+            ifPast_lookWasPeek = false;
+            makeANew_Peek = false;
+            preinspected_PEEK_token = new Token(TokenType.LPAREN);
+
 
         }
         /** reads another line...
@@ -144,6 +155,34 @@ namespace Parse
 
             // so we have something to read tokens from
 
+
+
+            // only used for buffer if last look was peek. other wise a fresh new token is found
+
+            //gives a previous new find
+
+            if (this.preinspected_PEEK_token == null )
+            {
+                return null;
+            }
+
+            
+
+            if (this.ifPast_lookWasPeek == true && !this.makeANew_Peek)
+            {
+                // this only really gets set to false by a call purely from getNextToken in Parser
+                // since
+                //    peek's method behind the scenes set ifPast_lookWasPeek to true
+                this.ifPast_lookWasPeek = false;
+
+                return this.preinspected_PEEK_token;
+                    
+
+            }
+            
+                
+            // else
+            //  find a new token to be returned
             Token returnToken = null;
 
             try
@@ -161,6 +200,7 @@ namespace Parse
                     if (this.noMoreLinesOfInput == false)
                     {
                         Console.Error.WriteLine("error: no input given.");
+                        this.preinspected_PEEK_token = null;
                         return null;
                     }
                 }
@@ -171,7 +211,11 @@ namespace Parse
                     this.noMoreLinesOfInput = this.readAnotherLine();
 
                 if (!this.noMoreLinesOfInput)
+                {
+                    this.preinspected_PEEK_token = null;
+                    // return null value
                     return returnToken;
+                }
 
 
 
@@ -280,9 +324,11 @@ namespace Parse
                 if (ch == '\'')
 
                 {
-                    quoteMark_engaged = true;
+                    this.quoteMark_engaged = true;
 
-                    
+                    charIndexOfReadLine++;
+
+                    Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = true;
 
                     return new Token(TokenType.LPAREN);
                     
@@ -352,9 +398,10 @@ namespace Parse
 
                     this.charIndexOfReadLine++;
 
-                    
+
 
                     // We ignore the special identifier `...'.
+                    Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = true;
 
                     returnToken = new Token(TokenType.DOT);
                     //return new Token (TokenType.DOT);
@@ -1267,6 +1314,24 @@ namespace Parse
             return returnToken;
 
         }
+        public Token peekAtNextToken()
+        {
+
+            Token returnToken;
+
+            // set peek to this setting of peek
+            this.makeANew_Peek = true;
+            // token returned as station
+            returnToken = this.getNextToken();
+            this.ifPast_lookWasPeek = true;
+            this.makeANew_Peek = false;
+
+            this.preinspected_PEEK_token = returnToken;
+            return returnToken;
+            
+        }
+
+
     }
 
 }
