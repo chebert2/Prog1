@@ -63,7 +63,7 @@ namespace Parse
 
         public static bool stillReadFirstParenthesis;
 
-        public static bool need_to_insert_right_parenthesis;
+        // public static bool need_to_insert_right_parenthesis;
 
         public static bool flip_Past_RightParenthesis_after_tail;
 
@@ -75,7 +75,7 @@ namespace Parse
         // this to keep track of parenthesis around a dotted   (expression . () )
         public static bool tail_item_A_list = false;
         public static Token pushedBack_extraToken_fromQuoteMark_;
-        public static bool still_need_to_put_in_RPAREN__next_iteration;
+        //public static bool still_need_to_put_in_RPAREN__next_iteration;
         public static bool quote_extension_going = false;
         public static bool emptyTerm;
 
@@ -111,10 +111,8 @@ namespace Parse
             bool newTrouble = true;
             bool trouble;
 
-
-            if (currentToken1 != null  &&  currentToken1.getType() != TokenType.QUOTE 
-                
-                && !stillReadFirstParenthesis    && 
+               
+            if ( !stillReadFirstParenthesis    && 
                 
                 pushedBack_extraToken_fromQuoteMark_ == null  )
 
@@ -137,7 +135,7 @@ namespace Parse
                 if (scanner.quoteMark_engaged)
                 {
                     // reset this
-                    need_to_insert_right_parenthesis = false;
+                    //need_to_insert_right_parenthesis = false;
                     TokenPeekedAt = scanner.peekAtNextToken();
 
                     if (TokenPeekedAt != null)
@@ -197,24 +195,12 @@ namespace Parse
                 }
 
             }
-            else if (need_to_insert_right_parenthesis && currentToken2 == null)
-            {
-                if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true)
-                    toggleIf_inputVaries = false;
-                else
-                    toggleIf_inputVaries = true;
-                currentToken1 = scanner.getNextToken();
-
-                if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true && toggleIf_inputVaries)
-                    // assigned to index 1  like 0 1 2  A B C  for currenttoken// assigned to index 1  like 0 1 2  A B C  for currenttoken
-                    Parser.quote_mark__misc_LPAREN__0___2 = 'B';
-
-                need_to_insert_right_parenthesis = false;
-
-            }
+            
             // dealing with extension of a quote mark to (quote expre)
             else if (stillReadFirstParenthesis)
             {
+
+
                 if (pushedBack_extraToken_fromQuoteMark_ == null)
                 {
                     // for assignments of tokens ... skip all below steps  
@@ -222,33 +208,35 @@ namespace Parse
 
                     // normal transfer of token 2 to token 1  after the following
 
-                    // 1st check if current token 2 
-                    // contains the defunct symbol for a ' mark  (the symbol ' is assigned coincidently is LPAREN..)
-                    if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data &&
-                        Parser.quote_mark__misc_LPAREN__0___2 == 'C')
-                        trouble = false;
 
 
                     // normal transfer of token 2 to token 1 
-                    else
-                        currentToken1 = currentToken2;
-                    // we can go on continuing quote as usual in this iteration of parseExp();
-                    Parser.quote_extension_going = false;
 
-                    Parser.still_need_to_put_in_RPAREN__next_iteration = true;
+                    pushedBack_extraToken_fromQuoteMark_ = scanner.getNextToken();
+                }     
+                    
+                 
+                    
 
-                }
-                else if (pushedBack_extraToken_fromQuoteMark_.getType() == TokenType.LPAREN)
+                
+
+
+                if (pushedBack_extraToken_fromQuoteMark_.getType() == TokenType.LPAREN)
                 {
 
                     Token quickLookPeek = scanner.peekAtNextToken();
                     if (quickLookPeek.getType() == TokenType.RPAREN)
                     {
                         returnNode = nil_object;
+                        // increment now  to get it over with
+                        scanner.getNextToken();
+                        // now get the next token for the circle iteratoin
+                        currentToken1 = scanner.getNextToken();
+
                         // we can go on continuing quote as usual in this iteration of parseExp();
                         Parser.quote_extension_going = false;
 
-                        need_to_insert_right_parenthesis = true;
+                        // algorithm, no longer need this.  need_to_insert_right_parenthesis = true;
                         // change due to removal of current token 2 below
                         if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data &&
                             Parser.quote_mark__misc_LPAREN__0___2 == 'C')
@@ -258,8 +246,7 @@ namespace Parse
                             Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = false;
 
                         }
-                  // this is its own way to plan capping the expression off of  (quote  exp
-                        currentToken2 = new Token(TokenType.RPAREN);
+                  
 
                         stillReadFirstParenthesis = false;
                         return returnNode;
@@ -275,12 +262,15 @@ namespace Parse
                             Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = false;
                         }
                         // reassign this to one that will be used at moment on in code following
-                        currentToken1 = new Token(TokenType.LPAREN);
+                        //currentToken1 = new Token(TokenType.LPAREN);
+                        // same as next declaration
+                        currentToken1 = pushedBack_extraToken_fromQuoteMark_;
+                        currentToken2 = scanner.getNextToken();
                         // do not continue quote as usual in this iteration of parseExp();
                        //so  Parser.quote_extension_going    stays  true;
 
                         number_of_Left_parentheses_extra_over_zero++;
-                        Parser.still_need_to_put_in_RPAREN__next_iteration = true;
+                        // algorithm, no longer need it. Parser.still_need_to_put_in_RPAREN__next_iteration = true;
                         stillReadFirstParenthesis = false;
                         // for assignments of tokens ... skip all below steps  
                         // out further beyond of this block section
@@ -303,13 +293,13 @@ namespace Parse
                     }
 
                     currentToken1 = pushedBack_extraToken_fromQuoteMark_;
-
+                    
                     // we can go on continuing quote as usual in this iteration of parseExp();
                     Parser.quote_extension_going = false;
 
-                    currentToken2 = new Token(TokenType.RPAREN);
+                    
                     stillReadFirstParenthesis = false;
-                    need_to_insert_right_parenthesis = true;
+                    // algorithm, no longer need this.  need_to_insert_right_parenthesis = true;
                     // for assignments of tokens ... skip all below steps  
                     // out further beyond of this block section
                     emptyTerm = true;
@@ -330,11 +320,7 @@ namespace Parse
                     Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = false;
 
                 }
-                // wipe out remains of currentToken 2 if it was a quote erroneous  LPAREN for ' mark
-                else if (Parser.quote_mark__misc_LPAREN__0___2 == 'C'   && 
-                    Parser.quote_mark_misc_to_placed_cursor__is_not_new_data)
-
-                    currentToken2 = null;
+               
 
 
 
@@ -362,7 +348,7 @@ namespace Parse
                 if (scanner.quoteMark_engaged == true && runningStarted_ForSomething == true)
                 {
                     // reset this  to new value, given where things occured
-                    need_to_insert_right_parenthesis = false;
+                    // algorithm, no longer need this.  need_to_insert_right_parenthesis = false;
 
                     if (currentToken2 != null && Parser.quote_mark__misc_LPAREN__0___2 != 'C')
                     {
@@ -461,45 +447,29 @@ namespace Parse
                           // the pushed back token is one delayed from quote form extension where a token had to be put aside last run
                 else if(!scanner.quoteMark_engaged && !Parser.quote_extension_going && Parser.pushedBack_extraToken_fromQuoteMark_ == null)
                 {
-
-                    // dont look next if we are extending parenthesis.
-                    if (Parser.still_need_to_put_in_RPAREN__next_iteration
-                                   &&
-
-                        (Parser.number_of_Left_parentheses_extra_over_zero > 0
-                           && Parser.number_of_Left_parentheses_extra_over_zero < 4)
-                        )
-                        // may need to change above number criteria left_parentheses
-                    {
-                        emptyTerm = false;
-                        //perhaps this is needed
-                        need_to_insert_right_parenthesis = true;
-                    }
-
-                    // important  Reads next token for the standard input flow
-                    else
-                    {  
-                        //  //ignoree this part
-                             // this inspects to mark that next token taken in will or will not turn out to be quote mark
-                                if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true)
-                                      toggleIf_inputVaries = false;
-                                else
-                                      toggleIf_inputVaries = true;
-                         // read next token
-                        currentToken2 = this.scanner.getNextToken();
-                   
-                        // this is run if the next token turns out to be a quote mark
-                        if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true && toggleIf_inputVaries)
-                            // assigned to index 1  like 0 1 2  A B C  for currenttoken// assigned to index 1  like 0 1 2  A B C  for currenttoken
-                            Parser.quote_mark__misc_LPAREN__0___2 = 'C';
-
-                        
-                    }
-                } 
                     
+                    // important  Reads next token for the standard input flow
+                    //  //ignoree this part
+                    // this inspects to mark that next token taken in will or will not turn out to be quote mark
+                    if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true)
+                        toggleIf_inputVaries = false;
+                    else
+                        toggleIf_inputVaries = true;
+                    // read next token
+                    currentToken2 = this.scanner.getNextToken();
+
+                    // this is run if the next token turns out to be a quote mark
+                    if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true && toggleIf_inputVaries)
+                        // assigned to index 1  like 0 1 2  A B C  for currenttoken// assigned to index 1  like 0 1 2  A B C  for currenttoken
+                        Parser.quote_mark__misc_LPAREN__0___2 = 'C';
+
+
+                }
+
+
                 // assign token reserved from pushed back element in quotation mark delay extension
-                  // start wiping it out because quote extension going is false
-                else if(!scanner.quoteMark_engaged && !Parser.quote_extension_going && Parser.pushedBack_extraToken_fromQuoteMark_ != null)
+                // start wiping it out because quote extension going is false
+                else if (!scanner.quoteMark_engaged && !Parser.quote_extension_going && Parser.pushedBack_extraToken_fromQuoteMark_ != null)
                 {
                     //  dont need this line currentToken2 = pushedBack_extraToken_fromQuoteMark_;
 
@@ -557,36 +527,79 @@ namespace Parse
             Parser.emptyTerm = false;
 
 
-                if (currentToken1.getType() == TokenType.LPAREN)
+            if (currentToken1.getType() == TokenType.LPAREN)
+            {
+
+                number_of_Left_parentheses_extra_over_zero++;
+                // a new expression will deal with the requirement that special types 
+                //need a tail non nil element
+                if (Parser.special_type_Has_to_have_non_nil_cdr && Parser.lastRunHad_Special_id >= 1)
                 {
-
-                    number_of_Left_parentheses_extra_over_zero++;
-                    // a new expression will deal with the requirement that special types 
-                    //need a tail non nil element
-                    if (Parser.special_type_Has_to_have_non_nil_cdr && Parser.lastRunHad_Special_id >= 1)
-                    {
-                        Parser.lastRunHad_Special_id = 0;
-                        Parser.special_type_Has_to_have_non_nil_cdr = false;
-                    }
+                    Parser.lastRunHad_Special_id = 0;
+                    Parser.special_type_Has_to_have_non_nil_cdr = false;
+                }
 
 
-                    if (Scanner.flag_debugger)
-                        Console.WriteLine("LPAREN");
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("LPAREN");
+                // note _ check for null _ only in interest of avoiding null point for the test
+                //   currenttoken2.getTYpe() ...only making sure
+                if (currentToken2 != null && (currentToken2.getType() != TokenType.QUOTE))
+                    Parser.quote_extension_going = false;
+
+                // a quote is a matched inmate   wedged in here to the clause   LPAREN quote   as in  (quote ...
+                // define node in static variable for future reference !... after a unit has parsed a leftSide list !
+
+
+                if (currentToken2.getType() == TokenType.QUOTE)
+                {
+                    // start doing quote cons expression
+                    // a special type now has to have a tail non-nill element!
+                    Parser.special_type_Has_to_have_non_nil_cdr = true;
+
+                    Ident firstIdent = new Ident("quote");
+
+                    // set flag to get next expression, 
+                    //whether it is pushedBack_extraToken_fromQuoteMark_ or more ( expression)
+                    stillReadFirstParenthesis = true;
+
+                    Node newParseNode = this.parseExp();
+
+                    Cons inBetweenSection;
+                    // check if parseExp worked      an error if it is null
+                    if (newParseNode == null)
+                        // error
+                        return null;
+                    else
+                        inBetweenSection = new Cons(newParseNode, nil_object);
 
 
 
+
+                    Cons secondSection = new Cons(firstIdent, inBetweenSection);
+
+                    Parser.number_of_Left_parentheses_extra_over_zero--;
+
+
+                    return secondSection;
+
+
+                }
+
+                else
+                {
                     returnNode = parseRest();
 
 
-                    // define node in static variable for future reference !... after a unit has parsed a leftSide list !
-                    if(currentToken2 != null && (currentToken2.getType() != TokenType.QUOTE )  )
-                       Parser.quote_extension_going = false;
+
 
                     //currentNode_ofToken1 = returnNode;
                     return returnNode;
                 }
-                // also need to convert '(list)
-                else if (currentToken1.getType() == TokenType.FALSE)
+
+            }
+            // also need to convert '(list)
+            else if (currentToken1.getType() == TokenType.FALSE)
                 {
                     // a new expression will deal with the requirement that special types 
                     //need a tail non nil element
@@ -668,6 +681,9 @@ namespace Parse
 
                     return returnNode;
                 }
+                // this never gets run ... since it is squished inside of  if(currentToken1 == TokenType.LPAREN)
+                   // instead
+                   /**
                 else if (currentToken1.getType() == TokenType.QUOTE)
                 {
                     if (Scanner.flag_debugger)
@@ -703,7 +719,7 @@ namespace Parse
 
 
                     // assigned to index 1  like 0 1 2  A B C  for currenttoken// assigned to index 1  like 0 1 2  A B C  for currenttoken
-                    Parser.currentToken2 = new Token(TokenType.RPAREN);
+                   
 
                     // delete the quote mark LPAREN   from prevoius ' mark
                     if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data)
@@ -728,6 +744,7 @@ namespace Parse
 
 
                 }
+    **/
                 else if (currentToken1.getType() == TokenType.IDENT)
                 {
                     String tokenTypeIdent = currentToken1.getName();
@@ -846,7 +863,7 @@ namespace Parse
 
                     // lets turn things so can go on continuing quote as usual in this iteration of parseExp();
                     Parser.quote_extension_going = false;
-                    Parser.still_need_to_put_in_RPAREN__next_iteration = false;
+                    
 
                     // iterate peek until we get to non null non Right Parenthesis token.
                     TokenPeekedAt = scanner.peekAtNextToken();
@@ -894,7 +911,7 @@ namespace Parse
                         Console.Error.WriteLine("Error: Token is unidentifiable in our grammar.");
                 // lets turn things so can go on continuing quote as usual in this iteration of parseExp();
                 Parser.quote_extension_going = false;
-                still_need_to_put_in_RPAREN__next_iteration = false;
+                
 
                 return null;
                 }
