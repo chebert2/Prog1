@@ -75,11 +75,15 @@ namespace Parse
         // this to keep track of parenthesis around a dotted   (expression . () )
         public static bool tail_item_A_list = false;
         public static Token pushedBack_extraToken_fromQuoteMark_;
-        //public static bool still_need_to_put_in_RPAREN__next_iteration;
+       // public static bool no_RPAREN__next_iteration_after_tail_with_dot;
         public static bool quote_extension_going = false;
         public static bool emptyTerm;
 
         public static bool runningStarted_ForSomething;
+        // something that will flip as an accessory to a tri chain of of printing right parenthesis mark
+        public static bool condition_in_dotted_exp;
+
+        public static int cancel_balance_number_Left_Paren__DottedExp;
         
         
 
@@ -111,13 +115,18 @@ namespace Parse
             bool newTrouble = true;
             bool trouble;
 
-               
+            /**
+            if (currentToken1 != null && currentToken1.getType() == TokenType.IDENT)
+                if (currentToken1.getName() == "cards")
+                    //Console.WriteLine("right");
+            **/
             if ( !stillReadFirstParenthesis    && 
                 
                 pushedBack_extraToken_fromQuoteMark_ == null  )
 
                 quote_extension_going = false;
 
+            
 
 
             if (firstRun)
@@ -134,48 +143,8 @@ namespace Parse
                 // start delving into a quote mark extension from '   to   (quote    so on later.... expres
                 if (scanner.quoteMark_engaged)
                 {
-                    // reset this
-                    //need_to_insert_right_parenthesis = false;
-                    TokenPeekedAt = scanner.peekAtNextToken();
 
-                    if (TokenPeekedAt != null)
-                    {
-
-                        if (TokenPeekedAt.getType() != TokenType.RPAREN)
-                            quote_mark_succeeded_incrementing_tokens = true;
-                        else
-                            do
-                            {
-                                Console.Error.WriteLine(" ) _right parenthesis cannot appear right after quote");
-
-                                TokenPeekedAt = scanner.peekAtNextToken();
-                                if (TokenPeekedAt != null)
-                                {
-                                    break;
-                                }
-
-                                if (TokenPeekedAt.getType() != TokenType.RPAREN)
-                                    quote_mark_succeeded_incrementing_tokens = true;
-
-                            }
-                            while (!quote_mark_succeeded_incrementing_tokens);
-
-                        if (TokenPeekedAt == null)
-                        {
-                            quote_mark_succeeded_incrementing_tokens = false;
-                            Console.Error.WriteLine("Current token a ' err) and EOF reached: not a complete quotation expression.");
-                            return null;
-                        }
-                        else
-                            quote_mark_succeeded_incrementing_tokens = true;
-                    }
-                    else
-                    {
-                        quote_mark_succeeded_incrementing_tokens = false;
-                        Console.Error.WriteLine("EOF cannot go Further checking faulty incomplete expression (quote rightpar)");
-                        return null;
-                    }
-
+                    
                     // set up our accessing current read token feed to delegate onward
                     currentToken1 = new Token(TokenType.LPAREN);
                     currentToken2 = new Token(TokenType.QUOTE);
@@ -213,25 +182,40 @@ namespace Parse
                     // normal transfer of token 2 to token 1 
 
                     pushedBack_extraToken_fromQuoteMark_ = scanner.getNextToken();
-                }     
                     
-                 
-                    
-
-                
+                }
 
 
-                if (pushedBack_extraToken_fromQuoteMark_.getType() == TokenType.LPAREN)
+
+
+
+                if (pushedBack_extraToken_fromQuoteMark_ == null)
                 {
+                    Console.Error.WriteLine("ran out of input to complete expression.");
+                    return null;
+                }
 
-                    Token quickLookPeek = scanner.peekAtNextToken();
+                else if (pushedBack_extraToken_fromQuoteMark_.getType() == TokenType.LPAREN)
+                {
+                    Token quickLookPeek = null;
+
+                    if (scanner.ifPast_lookWasPeek)
+                        quickLookPeek = scanner.getLast_item_peeked_at();
+                    else
+                        quickLookPeek = scanner.peekAtNextToken();
+
                     if (quickLookPeek.getType() == TokenType.RPAREN)
                     {
                         returnNode = nil_object;
-                        // increment now  to get it over with
-                        scanner.getNextToken();
-                        // now get the next token for the circle iteratoin
-                        currentToken1 = scanner.getNextToken();
+                        // only do following if more of phrase to be absorbed.
+                        if(Parser.number_of_Left_parentheses_extra_over_zero != 0)
+                        {
+                            // increment now  to get it over with
+                            scanner.getNextToken();
+                            // now get the next token for the circle iteration
+                            currentToken2 = scanner.getNextToken();
+                        }
+                        
 
                         // we can go on continuing quote as usual in this iteration of parseExp();
                         Parser.quote_extension_going = false;
@@ -265,6 +249,7 @@ namespace Parse
                         //currentToken1 = new Token(TokenType.LPAREN);
                         // same as next declaration
                         currentToken1 = pushedBack_extraToken_fromQuoteMark_;
+                        
                         currentToken2 = scanner.getNextToken();
                         // do not continue quote as usual in this iteration of parseExp();
                        //so  Parser.quote_extension_going    stays  true;
@@ -293,11 +278,17 @@ namespace Parse
                     }
 
                     currentToken1 = pushedBack_extraToken_fromQuoteMark_;
-                    
-                    // we can go on continuing quote as usual in this iteration of parseExp();
-                    Parser.quote_extension_going = false;
 
+                    // only do following if more of phrase to be absorbed.
+                    if (Parser.number_of_Left_parentheses_extra_over_zero > 1 )
+                    {
+                        currentToken2 = scanner.getNextToken();
+                    }
                     
+                    // turn off  parseExp();
+                    Parser.quote_extension_going = false;
+                    Parser.pushedBack_extraToken_fromQuoteMark_ = null;
+
                     stillReadFirstParenthesis = false;
                     // algorithm, no longer need this.  need_to_insert_right_parenthesis = true;
                     // for assignments of tokens ... skip all below steps  
@@ -371,8 +362,8 @@ namespace Parse
                     }
                     else
                     {
-
                         TokenPeekedAt = scanner.peekAtNextToken();
+
                         if (TokenPeekedAt != null)
                         {
                             if (TokenPeekedAt.getType() != TokenType.RPAREN)
@@ -531,6 +522,10 @@ namespace Parse
             {
 
                 number_of_Left_parentheses_extra_over_zero++;
+
+                if (Parser.condition_in_dotted_exp)
+                    Parser.cancel_balance_number_Left_Paren__DottedExp++;
+
                 // a new expression will deal with the requirement that special types 
                 //need a tail non nil element
                 if (Parser.special_type_Has_to_have_non_nil_cdr && Parser.lastRunHad_Special_id >= 1)
@@ -577,7 +572,7 @@ namespace Parse
 
 
                     Cons secondSection = new Cons(firstIdent, inBetweenSection);
-
+                    // lower this... since we added a closing nil   for a Right PAREN
                     Parser.number_of_Left_parentheses_extra_over_zero--;
 
 
@@ -590,8 +585,7 @@ namespace Parse
                 {
                     returnNode = parseRest();
 
-
-
+                    
 
                     //currentNode_ofToken1 = returnNode;
                     return returnNode;
@@ -930,7 +924,9 @@ namespace Parse
             
             Node endReturnNode = null;
 
-            Boolean toggleIf_inputVaries;
+            bool toggleIf_inputVaries;
+            
+
 
             // TODO: write code for parsing a rest
             if (currentToken2 == null)
@@ -938,35 +934,13 @@ namespace Parse
                 Console.Error.WriteLine("stops at start of expression_ Or while exceeded balance of LeftParentheses. Not a complete statement.");
                 return null;
             }
-            if (currentToken2.getType() == TokenType.RPAREN )
+            if (Parser.flip_Past_RightParenthesis_after_tail )
             {
-                if (Scanner.flag_debugger)
-                    Console.WriteLine("RPAREN");
-                endReturnNode = nil_object;
-
-                // even though a cons made of a id and a tail    
-                //   is now made part of cdr properly in list
-                //  However, the current cursor of token 2 is still on the closing ) 
-                // of cons expression
-                // and // because the current cursor was only set on the previous peek
-                // of this right parenthesis.
-                // so we need to move token up one for future parse expression
-
-                if (Parser.flip_Past_RightParenthesis_after_tail)
-                {
-                    if (scanner.peekAtNextToken().getType() == TokenType.RPAREN)
-                        scanner.getNextToken();
-                    Parser.flip_Past_RightParenthesis_after_tail = false;
-                }
 
                 // prevent Rest from repeating a nil
                 currentToken1 = currentToken2;
 
-                
-
-                Parser.number_of_Left_parentheses_extra_over_zero--;
-
-                if (Parser.number_of_Left_parentheses_extra_over_zero != 0)
+                 if (Parser.number_of_Left_parentheses_extra_over_zero != 0)
                 {
                     if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true)
                         toggleIf_inputVaries = false;
@@ -980,7 +954,52 @@ namespace Parse
                     
 
                 }
+                Parser.flip_Past_RightParenthesis_after_tail = false;
+                
+                return parseRest();
+            }
+            // will print rparenthesis when appropriate
+            if (currentToken2.getType() == TokenType.RPAREN )
+            {
+                if (Scanner.flag_debugger)
+                    Console.WriteLine("RPAREN");
+                endReturnNode = nil_object;
 
+                // this is the core measure of parenthesis balance in the parser
+                 Parser.number_of_Left_parentheses_extra_over_zero--;
+                
+                // do this for tail balanced L and R parentheses , heuristics
+                if (Parser.condition_in_dotted_exp)
+                   Parser.cancel_balance_number_Left_Paren__DottedExp--;
+
+                // prevent Rest from repeating a nil
+                   // nextItemRPAREN basically says to not jump to closing tail boundary
+                     // in a special dot tail case
+                if ( !Parser.condition_in_dotted_exp || Parser.cancel_balance_number_Left_Paren__DottedExp != 0 
+                    && Parser.number_of_Left_parentheses_extra_over_zero != 0)
+                {
+                    currentToken1 = currentToken2;
+                    
+
+                    if (Parser.number_of_Left_parentheses_extra_over_zero != 0)
+                    {
+                        if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true)
+                            toggleIf_inputVaries = false;
+                        else
+                            toggleIf_inputVaries = true;
+                        currentToken2 = this.scanner.getNextToken();
+
+                        if (Parser.quote_mark_misc_to_placed_cursor__is_not_new_data == true && toggleIf_inputVaries)
+                            // assigned to index 1  like 0 1 2  A B C  for currenttoken// assigned to index 1  like 0 1 2  A B C  for currenttoken
+                            Parser.quote_mark__misc_LPAREN__0___2 = 'C';
+
+
+                    }
+                }
+
+                
+                
+                
             }
             // work on  in parseRest() Like handling single following right ')'
             else if (currentToken2.getType() == TokenType.DOT)
@@ -998,9 +1017,12 @@ namespace Parse
 
                     currentToken2 = this.scanner.getNextToken();
                     
-                    return parseRest();
+                    Node parsedRest =  parseRest();
+                    
+                    return parsedRest;
                     //ends if that happens
                 }
+                Parser.condition_in_dotted_exp = true;
 
                 currentToken1 = currentToken2;
 
@@ -1008,7 +1030,14 @@ namespace Parse
 
                 if (currentToken2 != null)
                 {
-                    if (currentToken2.getType() == TokenType.INT)
+                    if (currentToken2.getType() == TokenType.LPAREN)
+                    {
+                        Parser.tail_item_A_list = true;
+                        endReturnNode = parseExp();
+                        
+                    }
+
+                    else if (currentToken2.getType() == TokenType.INT)
                     {
                         endReturnNode = new IntLit(currentToken2.getIntVal());
 
@@ -1044,7 +1073,9 @@ namespace Parse
                         
                             Console.Error.WriteLine(" ) _right parenthesis cannot appear right after quote");
 
-                            TokenPeekedAt = scanner.peekAtNextToken();
+                       
+                         TokenPeekedAt = scanner.peekAtNextToken();
+
 
                         if (TokenPeekedAt == null)
                         {
@@ -1060,9 +1091,10 @@ namespace Parse
                                 do
                                 {
                                     Console.Error.WriteLine(" ) _right parenthesis cannot appear right after quote");
-                                    TokenPeekedAt = scanner.peekAtNextToken();
 
-                                   if (TokenPeekedAt == null)
+                                  TokenPeekedAt = scanner.peekAtNextToken();
+
+                                if (TokenPeekedAt == null)
                                    {
                                        Console.Error.WriteLine("Current token a ' err) and EOF reached: not a complete quotation expression.");
                                         return null;
@@ -1075,14 +1107,17 @@ namespace Parse
                                     
                                 }
                                 while (!quote_mark_succeeded_incrementing_tokens);
-                            if (TokenPeekedAt == null)
-                            {
-                                quote_mark_succeeded_incrementing_tokens = false;
-                                Console.Error.WriteLine("Current token a ' err) and EOF reached: not a complete quotation expression.");
-                                return null;
-                            }
-                            else
-                                quote_mark_succeeded_incrementing_tokens = true;
+                        if (TokenPeekedAt == null)
+                        {
+                            quote_mark_succeeded_incrementing_tokens = false;
+                            Console.Error.WriteLine("Current token a ' err) and EOF reached: not a complete quotation expression.");
+                            return null;
+                        }
+                        else
+                        {
+                            quote_mark_succeeded_incrementing_tokens = true;
+                            currentToken2 = TokenPeekedAt;
+                        }
                       // assign right dot item.
                         if (TokenPeekedAt.getType() == TokenType.INT)
                         {
@@ -1122,21 +1157,11 @@ namespace Parse
 
                             
                             endReturnNode = parseExp();
-                            number_of_Left_parentheses_extra_over_zero--;
-
+                            
                         }
-
+                        currentToken2 = TokenPeekedAt;
                     }
-                    else
-                    {
-                        Parser.tail_item_A_list = true;
-                        endReturnNode = parseExp();
-                        number_of_Left_parentheses_extra_over_zero--;
-                        
-
-
-
-                    }
+                    
 
 
                     // check if there is correct grammar for a tail node with it's sole_literal value
@@ -1148,8 +1173,41 @@ namespace Parse
                     // token beyond the next RightParenthesis
 
                     //  continues iterating on ... if Parsing ERRORS.
-                    
-                    extraPeekedAtToken = currentToken2;
+
+
+
+                    extraPeekedAtToken = scanner.peekAtNextToken();
+                    // check if next token is a right Parenthesis
+                    if (extraPeekedAtToken != null &&
+                        extraPeekedAtToken.getType() == TokenType.RPAREN)
+                    {
+                        
+                        currentToken2 = scanner.getNextToken();
+
+                        Parser.condition_in_dotted_exp = false;
+
+                        Parser.flip_Past_RightParenthesis_after_tail = true;
+
+                        number_of_Left_parentheses_extra_over_zero--;
+
+                        return endReturnNode;
+                    }
+                    else if (extraPeekedAtToken == null)
+                    {
+                        Console.Error.WriteLine("end of input at dotted S-Expression before closing parenthesis.");
+                        return null;
+                    }
+                    else if (extraPeekedAtToken.getType() == TokenType.INT ||
+                                  extraPeekedAtToken.getType() == TokenType.STRING ||
+                                  extraPeekedAtToken.getType() == TokenType.TRUE ||
+                                  extraPeekedAtToken.getType() == TokenType.FALSE ||
+                                  extraPeekedAtToken.getType() == TokenType.IDENT)
+                    {
+                        if (Scanner.flag_debugger)
+                            Console.WriteLine("error : cannot have any more than one literal for dot non-list tail.");
+                        
+                    }
+
                     while (additional_ReadMore)
                     {
 
@@ -1167,12 +1225,13 @@ namespace Parse
 
                                 currentToken2 = scanner.getNextToken();
 
+                                Parser.condition_in_dotted_exp = false;
+
                                 return endReturnNode;
                             }
 
                             extraPeekedAtToken = scanner.peekAtNextToken();
 
-                         
 
                             if (extraPeekedAtToken == null)
                             {
@@ -1229,11 +1288,13 @@ namespace Parse
             // this does any further expansion of the parse tree  in any Cons created
             else
             {
-
-                Node oneExpression = parseExp();
                 
-                Node rest = parseRest();
 
+                Node oneExpression = parseExp(); ;
+           
+               
+            
+                Node rest = parseRest();
                 
 
                 if (oneExpression == null)
