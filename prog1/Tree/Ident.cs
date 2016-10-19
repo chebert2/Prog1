@@ -13,7 +13,7 @@ namespace Tree
             name = n;
         }
 
-        public override int print(int n)
+        public override void print(int n)
         {
             // There got to be a more efficient way to print n spaces.
             for (int i = 0; i < n; i++)
@@ -21,7 +21,7 @@ namespace Tree
 
             Console.Write(name);
 
-            return n + name.Length;
+            Special.Indentation_cumulative += name.Length;
         }
         public override bool isSymbol() { return true; }
 
