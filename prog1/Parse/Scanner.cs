@@ -27,7 +27,7 @@ namespace Parse
         // this flag is false to make sure that a once starting line is read for getToken() 
         private bool readFirstLine = false;
 
-        private bool noMoreLinesOfInput = false;
+        public bool noMoreLinesOfInput = false;
 
 
         public int numberParentheses_L = 0;
@@ -401,7 +401,7 @@ namespace Parse
 
 
                     // We ignore the special identifier `...'.
-                    Parser.quote_mark_misc_to_placed_cursor__is_not_new_data = true;
+                    
 
                     returnToken = new Token(TokenType.DOT);
                     //return new Token (TokenType.DOT);
@@ -1331,6 +1331,17 @@ namespace Parse
             
         }
 
+        public Token getLast_item_peeked_at()
+        {
+            Token returnToken;
+
+            returnToken = this.getNextToken();
+            
+            this.ifPast_lookWasPeek = true;
+            this.makeANew_Peek = false;
+
+            return returnToken;
+        }
 
     }
 
