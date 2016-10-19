@@ -8,7 +8,7 @@ namespace Tree
 
         // The argument of print(int) is the number of characters to indent.
         // Every subclass of Node must implement print(int).
-        public virtual int print(int n) { return 0; }
+        public virtual void print(int n) { }
 
         // The first argument of print(int, bool) is the number of characters
         // to indent.  It is interpreted the same as for print(int).
@@ -25,10 +25,10 @@ namespace Tree
         // encode that in the sign bit of n. If you need additional parameters,
         // make sure that you define the method print in all the appropriate
         // subclasses of Node as well.
-        public virtual int print(int n, bool p)
+        public virtual void print(int n, bool p)
         {
             print(n);
-            return 0;
+            
         }
 
         // For parsing Cons nodes, for printing trees, and later for
