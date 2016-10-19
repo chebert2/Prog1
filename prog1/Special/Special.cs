@@ -10,7 +10,21 @@ namespace Tree
 
     abstract public class Special
     {
+        //public static bool quote_noParenthesis;
+
+        public static int Indentation_cumulative;
+
+        public static bool printing_quote_Contents;
+        // last recent cons inspected  was itself a cdr
+        public static bool last_cons_A_cdr = false;
         
+        
+        // whenever some clause left indenting item is encountered
+        //
+        // we will store the previous node tree indentation in 
+        // at index i
+        // in a reserve array for
+        // reverting back to it when the new clause block is finished
 
         public abstract void print(Node t, int n, bool p);
     }
