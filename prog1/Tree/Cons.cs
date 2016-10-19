@@ -27,6 +27,7 @@ namespace Tree
         // parsing up to the interpreter.
         void parseList()
         {
+            
             if (car.isSymbol())
             {
                 Ident a = (Ident)car;
@@ -34,20 +35,20 @@ namespace Tree
                 string type = a.getSymbol();
                 if (type.Equals("quote"))
                     form = new Quote();
-                else if (type.Equals("if"))
-                    form = new If();
-                else if (type.Equals("begin"))
-                    form = new Begin();
-                else if (type.Equals("cond"))
-                    form = new Cond();
-                else if (type.Equals("define"))
-                    form = new Define();
-                else if (type.Equals("lambda"))
-                    form = new Lambda();
-                else if (type.Equals("let"))
-                    form = new Let();
-                else if (type.Equals("set!"))
-                    form = new Set();
+                //else if (type.Equals("if"))
+                //    form = new If();
+                //else if (type.Equals("begin"))
+                //    form = new Begin();
+                //else if (type.Equals("cond"))
+                //    form = new Cond();
+                //else if (type.Equals("define"))
+                //    form = new Define();
+                //else if (type.Equals("lambda"))
+                //    form = new Lambda();
+                //else if (type.Equals("let"))
+                //    form = new Let();
+                //else if (type.Equals("set!"))
+                //    form = new Set();
                 else
                     form = new Regular();
             }
@@ -55,14 +56,14 @@ namespace Tree
                 form = new Regular();
         }
 
-        public override int print(int n)
+        public override void print(int n)
         {
-            return form.print(this, n, false);
+            form.print(this, n, false);
         }
 
-        public override int print(int n, bool p)
+        public override void print(int n, bool p)
         {
-            return form.print(this, n, p);
+            form.print(this, n, p);
         }
         public override bool isPair() { return true; }
 
