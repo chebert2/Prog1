@@ -8,166 +8,152 @@ namespace Tree
 {
     public class Regular : Special
     {
-        // TODO: Add any fields needed.
         
-        public int local_indent;
-        public static bool current_Expression_NotEnded;
-        public static bool boolean_first_run;
-        public static bool lastCall_was_to_cdr;
+        // TODO: Add any fields needed.
+
+        //public int local_indent;
+        //public static bool current_Expression_NotEnded;
+        //public static bool boolean_first_run;
+        //public static bool lastCall_was_to_cdr;
         // TODO: Add an appropriate constructor.
         public Regular()
+
         {
-            local_indent = 0;
-            
+       
+            //local_indent = 0;
+
         }
 
-        public override int print(Node t, int n, bool p)
+        public override void print(Node t, int n, bool p)
         {
-            
-            // TODO: Implement this function.
-            // working implementation
+            //int Indent__just_direct_deal = 0;
 
-            if(boolean_first_run)
+            for(int i = 0; i<n; i++)
             {
-                current_Expression_NotEnded = true;
-                boolean_first_run = false;
+                Console.WriteLine(" ");
             }
 
-            local_indent = n;
+            bool carIs_null = false;
+            bool cdrIs_null = false;
 
-            if (!t.getCdr().isNull() && Regular.lastCall_was_to_cdr)
-                current_Expression_NotEnded = true;
+            // first we will check if the car of this item has is even a non-null node.
+            if (t.getCar() != null)
+                carIs_null = false;
             else
-                current_Expression_NotEnded = false;
-
-
-            if (p == false)
             {
-                
-                if(current_Expression_NotEnded || Regular.lastCall_was_to_cdr)
-                    Special.localExpression_ended_case = false;
+                carIs_null = true;
+                if (Scanner.flag_debugger)
+                    Console.Error.WriteLine("car is null... not correct.");
+                return;
+            }
+       // this will accomplish   printing only quote expression   and not the list quote form per se.
+            bool do_something__if_on_topmost_1st_cdr_side_of_mainLine;
+
+            if (Special.printing_quote_Contents == true)
+            {
+                if (Special.last_cons_A_cdr == false)
+                    do_something__if_on_topmost_1st_cdr_side_of_mainLine = false;
+
                 else
-                    Console.Write("(");
-                p = true;
-                local_indent = n + 1;
-            }
-
-            // print single car item // __ if it is not itself regular expression
-            if (!t.getCar().isPair())
-            {
-                if (t.getCar().isBool())
-                {
-                    BoolLit boolNode = (BoolLit) t.getCar();
-                    local_indent += 2;
-                }
-                else if(t.getCar().isSymbol())
-                {
-                    Ident identNode = (Ident) t.getCar();
-                    local_indent += identNode.print(0);
-                }
-                else if (t.getCar().isNumber())
-                {
-                    IntLit intNode = (IntLit) t.getCar();
-                    local_indent += intNode.print(0);
-                }
-                else if (t.getCar().isNull())
-                {
-                    Parser.nil_object.print(0);
-                    local_indent += 2;
-                }
-                else if (t.getCar().isString())
-                {
-                    StringLit stringNode = (StringLit) t.getCar();
-                    local_indent += stringNode.print(0);
-                }
+                    do_something__if_on_topmost_1st_cdr_side_of_mainLine = true;
+                
             }
             else
-            {
-                Regular.lastCall_was_to_cdr = false;
-                local_indent += t.getCar().print(0);
-
-             }
-
-            // check if cdr is a nil.
-            if (t.getCdr().isNull()) {
-                Console.Write(")");
-
-
-                // terminate if node is nil.
-                Special.localExpression_ended_case = true;
-
-                local_indent += 1;
-
-            }
-            // check if cdr is a single tail non-nil constant
-            else if (t.getCdr().isBool() )
-            {
-                Console.Write(" . ");
-                local_indent += 3;
-                t.getCdr().print(0);
-                //needs fixing
-                local_indent += 2;
-                Console.Write(")");
-                local_indent++;
-                p = false;
-            }
-            else if (t.getCdr().isNumber() )
-            {
-                Console.Write(" . ");
-                local_indent += 3;
-                IntLit intNodeHere = (IntLit) t.getCdr();
-               
-                local_indent += intNodeHere.print(0);
-                Console.Write(")");
-                local_indent++;
-                p = false;
-            }
-            else if (t.getCdr().isSymbol() )
-            {
-                Console.Write(" . ");
-                local_indent += 3;
-                Ident identNodeHere = (Ident) t.getCdr();
-
-                local_indent += identNodeHere.print(0);
-                Console.Write(")");
-                local_indent++;
-                p = false;
-            }
-            else if (t.getCdr().isString())
-            {
-                Console.Write(" . ");
-                local_indent += 3;
-                StringLit stringLitNodeHere = (StringLit)t.getCdr();
-
-                local_indent += stringLitNodeHere.print(0);
-                Console.Write(")");
-                local_indent++;
-                p = false;
-            }
+                do_something__if_on_topmost_1st_cdr_side_of_mainLine = false;
             
+
+
+
+
+
+                // write our left parenthesis.
+            if (carIs_null == false && !p)
+            {
+                Console.Write("(");
+
+                //Indent__just_direct_deal += 1;
+                //Special.Indentation_cumulative = n + Indent__just_direct_deal;
+                Special.Indentation_cumulative = n + 1;
+            }
+            else if(carIs_null == false)
+                Special.Indentation_cumulative = n;
+
+            bool carIs_consNode = false;
+
+            // check if car is a pair now.
+            if (carIs_null == false && t.getCar().isPair())
+                carIs_consNode = true;
+
+            // print car item     below code:
+            // car is a cons ...
+            if(carIs_null == false && carIs_consNode)
+            {
+                if (Special.printing_quote_Contents == true)
+                    Special.last_cons_A_cdr = false;
+
+                t.getCar().print(0, false);
+            }
+            // car is a primitive node
+            else if (carIs_null == false)
+            {
+                t.getCar().print(0, !p);
+            }
+            // else
+            // error
+
+
+           
+            // work on printing cdr of cons of t
+
+            if (t.getCdr() != null)
+                cdrIs_null = false;
             else
+                cdrIs_null = true;
+
+            if (cdrIs_null == false && t.getCdr().isPair())
             {
                 Console.Write(" ");
-                local_indent++;
-                // the only possible thing here could be a extended cons node
-                if (t.getCdr().isPair())
-                {
-                    Regular.lastCall_was_to_cdr = true;
+                Special.Indentation_cumulative += 1;
+
+                // reset this as case   with the upper most diagonal case  of cdr .. being followed
+              // this is a flag of whether the last cons node passed and inspected was a cdr.
+              // set to true here
+              // this flag is of a bit odd  and particular application  only in quote printing
+                if    (Special.printing_quote_Contents    && 
+                    
+                    do_something__if_on_topmost_1st_cdr_side_of_mainLine == true  )
+
+                    Special.last_cons_A_cdr = true;
 
 
-                    current_Expression_NotEnded = true;
-                    if (!t.getCdr().getCar().isPair())
-                        local_indent += t.getCdr().print(0, true);
-                    else
-                        local_indent += t.getCdr().print(0, false);
+
+                t.getCdr().print(0, true);
+                
+
+            }
+            // check if cdr is not undefined
+            else if (cdrIs_null == false)
+            {
+                // check if cdr is empty list.
+                if (t.getCdr().isNull() && do_something__if_on_topmost_1st_cdr_side_of_mainLine == false)
+                {                    
+                    // add one  only for right paren that closes the list
+                    Special.Indentation_cumulative += 1;
                 }
-                else
-                    throw new Exception("unknown Node for tail. Cannot print.");
+                // check if cdr ends with not a typical  nil () value.
+                else if(do_something__if_on_topmost_1st_cdr_side_of_mainLine == false)
+                {
+                    t.getCdr().print(0);
+                    // add one  only for right paren  closing list
+                    Special.Indentation_cumulative += 1;
+                }
+
+                if( do_something__if_on_topmost_1st_cdr_side_of_mainLine == false)
+                   Console.Write(")");
                 
             }
-            return local_indent;
+
         }
     }
 }
-
 
