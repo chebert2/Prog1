@@ -35,9 +35,13 @@ public class SPP
         Node root;
 
         
-        Special.localExpression_ended_case = false;
-        Regular.boolean_first_run = true;
-        Regular.lastCall_was_to_cdr = false;
+        
+        //Regular.boolean_first_run = true;
+        //Regular.lastCall_was_to_cdr = false;
+        Special.Indentation_cumulative = 0;
+        Special.printing_quote_Contents = false;
+        Special.last_cons_A_cdr = false;
+        
 
         Parser.pushedBack_extraToken_fromQuoteMark_ = null;
     Parser.special_type_Has_to_have_non_nil_cdr = false;
@@ -49,23 +53,22 @@ public class SPP
     Parser.flip_Past_RightParenthesis_after_tail = false;
         Parser.start_addit_Ident_needing_End_expression_tail = false;
 
-        Parser.need_to_insert_right_parenthesis = false;
-        Parser.still_need_to_put_in_RPAREN__next_iteration = false;
-        Parser.quote_extension_going = false;
+        Parser.condition_in_dotted_exp = false;
+        Parser.cancel_balance_number_Left_Paren__DottedExp = 0;
+    //Parser.need_to_insert_right_parenthesis = false;
+    //Parser.no_RPAREN__next_iteration_after_tail_with_dot = false;
+    Parser.quote_extension_going = false;
         Parser.runningStarted_ForSomething = false;
         Parser.emptyTerm = false;
         // Parse and pretty-print each input expression
 
         bool firstTimePrinting = false; 
         root = parser.parseExp();
-        if (root != null)
+        if (root != null && scanner.noMoreLinesOfInput != false)
             root.print(0);
-        while (root != null) 
+        while (root != null && scanner.noMoreLinesOfInput != false) 
         {
-            if (!firstTimePrinting)
-                firstTimePrinting = true;
-            else
-                root.print(0);
+            
 
 
             //an error if Console.WriteLine(Parser.number_of_Left_parentheses_extra_over_zero); 
@@ -87,18 +90,27 @@ public class SPP
             Parser.flip_Past_RightParenthesis_after_tail = false;
             Parser.tail_item_A_list = false;
             Parser.start_addit_Ident_needing_End_expression_tail = false;
-            Special.localExpression_ended_case = false;
-            Regular.boolean_first_run = true;
-            Regular.lastCall_was_to_cdr = false;
+            
+            //Regular.boolean_first_run = true;
+            //Regular.lastCall_was_to_cdr = false;
+            Special.Indentation_cumulative = 0;
+            Special.printing_quote_Contents = false;
+            Special.last_cons_A_cdr = false;
+            
 
-            Parser.need_to_insert_right_parenthesis = false;
+            //Parser.need_to_insert_right_parenthesis = false;
             Parser.runningStarted_ForSomething = false;
-            Parser.still_need_to_put_in_RPAREN__next_iteration = false;
+            //Parser.no_RPAREN__next_iteration_after_tail_with_dot = false;
             Parser.quote_extension_going = false;
             Parser.emptyTerm = false;
+            Parser.condition_in_dotted_exp = false;
+            Parser.cancel_balance_number_Left_Paren__DottedExp = 0;
 
             root = parser.parseExp();
-            
+            if(root != null && scanner.noMoreLinesOfInput != false)
+            root.print(0);
+
+
         }
         
 
