@@ -17,11 +17,26 @@ namespace Tree
         }
 
         public override void print(Node t, int n, bool p)
-        {
+        { 
             // TODO: Implement this function.
-            //return 0;
+            Node car = t.getCar();
+            Node cadr = t.getCdr().getCar();
+            for(int i = 0; i < n; i++)
+                Console.Writeline(" ");
+            if  (p == true)
+            {
+                Console.Writeline("(");
+            }
+            car.print(n);
+            if (t.getCdr().isPair())
+            { 
+                cadr.print(n, false);
+                Console.Writeline();
+            }
+            else 
+                t.getCdr().print(n,true):
+            Console.Writeline(")");
+            
         }
     }
 }
-
-
