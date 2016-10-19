@@ -13,14 +13,14 @@ namespace Tree
             stringVal = s;
         }
 
-        public override int print(int n)
+        public override void print(int n)
         {
             // There got to be a more efficient way to print n spaces.
             for (int i = 0; i < n; i++)
                 Console.Write(" ");
 
             Console.Write("\"" + stringVal + "\"");
-            return n + stringVal.Length;
+            Special.Indentation_cumulative +=  stringVal.Length;
         }
 
         public override bool isString() { return true; }
